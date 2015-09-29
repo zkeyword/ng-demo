@@ -1,5 +1,4 @@
 define(function(require){
-	
 	require('app').controller('HomeViewController', [
         '$scope',
 		'dateService',
@@ -8,7 +7,7 @@ define(function(require){
 			$scope,
 			dateService
 		){
-			console.log('IN: Controller first-controller');
+			
 			$scope.hello = '<span>Hello World from first-controller</span><script type="text/javascript">alert("xxx")</script>';
 			if(!dateService.getNow()) {
 				dateService.setNow();
@@ -19,6 +18,7 @@ define(function(require){
 			);
 			
 			$scope.pageClass = 'page-home'
+			
         }
     ]);
 });

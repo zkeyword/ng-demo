@@ -5,6 +5,7 @@ require.config({
 		'uiRouter' : '../lib/angular-ui-router.min',
 		'angular-animate' : '../lib/angular-animate.min',
 		'require' : '../lib/require',
+		'template' : '../lib/template'
 	},
 	shim: {
 		'angular': {
