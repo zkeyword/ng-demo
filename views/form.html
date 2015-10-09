@@ -13,27 +13,27 @@
 		</label>
 		<span class="ui-labelBlock">
 				<label>
-					<input class="ui-radio" type="radio" name="grade" value="5" >
+					<input class="ui-radio" type="radio" name="grade[]" value="5" >
 					<i class="ui-label ui-radio-label">5A</i>
 				</label>
 				<label>
-					<input class="ui-radio" type="radio" name="grade" value="4" >
+					<input class="ui-radio" type="radio" name="grade[]" value="4" >
 					<i class="ui-label ui-radio-label">4A</i>
 				</label>
 				<label>
-					<input class="ui-radio" type="radio" name="grade" value="3" >
+					<input class="ui-radio" type="radio" name="grade[]" value="3" >
 					<i class="ui-label ui-radio-label">3A</i>
 				</label>
 				<label>
-					<input class="ui-radio" type="radio" name="grade" value="2" >
+					<input class="ui-radio" type="radio" name="grade[]" value="2" >
 					<i class="ui-label ui-radio-label">2A</i>
 				</label>
 				<label>
-					<input class="ui-radio" type="radio" name="grade" value="1" >
+					<input class="ui-radio" type="radio" name="grade[]" value="1" >
 					<i class="ui-label ui-radio-label">1A</i>
 				</label>
 				<label>
-					<input class="ui-radio" type="radio" name="grade" value="0" >
+					<input class="ui-radio" type="radio" name="grade[]" value="0" >
 					<i class="ui-label ui-radio-label">未评级</i>
 				</label>
 		</span>
@@ -45,27 +45,27 @@
 		</label>
 		<span class="ui-labelBlock">
 				<label>
-					<input class="ui-checkbox" type="checkbox" name="grade" value="5" >
+					<input class="ui-checkbox" type="checkbox" name="grade2[]" value="5" >
 					<i class="ui-label ui-checkbox-label">5A</i>
 				</label>
 				<label>
-					<input class="ui-checkbox" type="checkbox" name="grade" value="4" >
+					<input class="ui-checkbox" type="checkbox" name="grade2[]" value="4" >
 					<i class="ui-label ui-checkbox-label">4A</i>
 				</label>
 				<label>
-					<input class="ui-checkbox" type="checkbox" name="grade" value="3" >
+					<input class="ui-checkbox" type="checkbox" name="grade2[]" value="3" >
 					<i class="ui-label ui-checkbox-label">3A</i>
 				</label>
 				<label>
-					<input class="ui-checkbox" type="checkbox" name="grade" value="2" >
+					<input class="ui-checkbox" type="checkbox" name="grade2[]" value="2" >
 					<i class="ui-label ui-checkbox-label">2A</i>
 				</label>
 				<label>
-					<input class="ui-checkbox" type="checkbox" name="grade" value="1" >
+					<input class="ui-checkbox" type="checkbox" name="grade2[]" value="1" >
 					<i class="ui-label ui-checkbox-label">1A</i>
 				</label>
 				<label>
-					<input class="ui-checkbox" type="checkbox" name="grade" value="0" >
+					<input class="ui-checkbox" type="checkbox" name="grade2[]" value="0" >
 					<i class="ui-label ui-checkbox-label">未评级</i>
 				</label>
 		</span>
@@ -74,14 +74,14 @@
 	<div class="ui-form">
 		<label>
 			<i class="ui-label"><em>*</em>普通input：</i>
-			<input type="text" name="ticket_remark" class="ui-input" value=""/>
+			<input type="text" name="ticket_remark2" class="ui-input" value=""/>
 		</label>
 	</div>
 
 	<div class="ui-form">
 		<label>
 			<i class="ui-label"><em>*</em>有提示信息：</i>
-			<input type="text" name="ticket_remark" class="ui-input" value=""/>
+			<input type="text" name="ticket_remark" class="ui-input" value="adfadf"/>
 			<span class="ui-form-message">区号+号码，例如：0529-0000001</span>
 		</label>
 	</div>
@@ -89,9 +89,11 @@
 	<div class="ui-form">
 		<label>
 			<i class="ui-label"><em>*</em>textarea：</i>
-			<textarea class="ui-textarea" ng-model="user.textarea"></textarea>
+			<textarea class="ui-textarea" ng-model="formData.textarea">adfadf</textarea>
 		</label>
 	</div>
+	
+	{{formData}}
 	
 	<input type="submit"/>
 

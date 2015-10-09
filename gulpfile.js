@@ -1,12 +1,13 @@
 var gulp        = require('gulp'),
 	less        = require('gulp-less'),
 	rjs         = require('gulp-requirejs'),
-	uglify      = require('gulp-uglify'),
 	jshint      = require('gulp-jshint'),
-	maps        = require('gulp-sourcemaps'),
-	minifycss   = require('gulp-minify-css'),
+	//maps        = require('gulp-sourcemaps'),
+	minifyJs    = require('gulp-uglify'),
+	minifyCss   = require('gulp-minify-css'),
+	minifyHTML  = require('gulp-htmlmin'),
+	minifyImg   = require('gulp-imagemin'),
 	sprite      = require('gulp.spritesmith'),
-	imagemin    = require('gulp-imagemin'),
 	clean       = require('gulp-clean'),
 	plumber     = require('gulp-plumber'),
 	concat      = require('gulp-concat'),
@@ -22,13 +23,13 @@ var gulp        = require('gulp'),
 gulp.task('less', function () {
     gulp
 		.src(path.dev+'less/styles.less')
-        .pipe(maps.init())
+        //.pipe(maps.init())
 		.pipe(plumber(function(error){
 			console.log(error);
 			console.log('--------------------------  less Syntax Error! --------------------------');
 		}))
 		.pipe(less())
-		.pipe(minifycss({compatibility: 'ie7'}))
+		.pipe(minifyCss({compatibility: 'ie7'}))
 		//.pipe(maps.write('./'))
         .pipe(gulp.dest(path.dest+'css'));
 });
@@ -45,7 +46,6 @@ gulp.task('jshint', function() {
 
 //requirejs
 gulp.task('r', function() {
-	
 
     rjs({
         name: '../main',
@@ -60,7 +60,7 @@ gulp.task('r', function() {
         out: 'main.js',
 		optimize:false
     })
-	//.pipe(uglify())
+	//.pipe(minifyJs())
 	.pipe(maps.write('./'))
     .pipe(gulp.dest(path.dest));
 
@@ -77,6 +77,16 @@ gulp.task('tmod', function() {
 		}));
 });
 
+//
+gulp.task('html', function() {
+	gulp.src( paths.htmlFiles , { base : REQUIREJS } )
+        //.pipe( changed( DIST ) )
+        .pipe( minifyHTML( {
+            removeComments : true ,
+            collapseWhitespace : true
+        } ) )
+        .pipe( gulp.dest( DIST ) );
+});
 
 //清理图片
 gulp.task('clean', [/*'clean:css', 'clean:js', */'clean:imagesDefault', 'clean:imagesSprite']);
@@ -119,32 +129,7 @@ gulp.task('clean:imagesSprite', function() {
 gulp.task('copy', ['clean', 'copy:plugs', 'copy:js', 'copy:images']);
 
 gulp.task('copy:plugs', function(){
-	/*
-	gulp
-		.src(path.dev+'less/lib/font-awesome-ie7.min.css')
-		.pipe(gulp.dest(path.dest+'css/'));
-		
-	gulp
-		.src(path.dev+'less/fonts/*')
-		.pipe(gulp.dest(path.dest+'css/fonts/'));	
 
-	gulp
-		.src(path.dev+'js/app/ZeroClipboard.swf')
-		.pipe(gulp.dest(path.dest+'js/app/'));
-
-	*/
-		
-	gulp
-		.src(path.dev+'js/app/zone_item.js')
-		.pipe(gulp.dest(path.dest+'js/app/'));
-	
-	gulp
-		.src(path.dev+'js/app/My97DatePicker/**/**.{png,jpg,jpeg,gif,js,css,html,htm}')
-		.pipe(gulp.dest(path.dest+'js/app/My97DatePicker/'));
-		
-	gulp
-		.src(path.dev+'js/app/jcrop/**')
-		.pipe(gulp.dest(path.dest+'js/app/jcrop/'));
 });
 
 gulp.task('copy:js', function(){
@@ -156,7 +141,7 @@ gulp.task('copy:js', function(){
 gulp.task('copy:images', function(){
 	gulp
 		.src(path.dev+'img/default/**/*.{png,jpg,jpeg,gif}')
-		.pipe(cache(imagemin({
+		.pipe(cache(minifyImg({
 			optimizationLevel: 3,
 			progressive: true,
 			interlaced: true
@@ -180,7 +165,7 @@ gulp.task('sprite:png', ['clean:imagesSprite'], function () {
 						}));
 		spriteData
 			.img
-			.pipe(imagemin({
+			.pipe(minifyImg({
 				optimizationLevel: 3,
 				progressive: true,
 				interlaced: true
@@ -204,7 +189,7 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 						}));
 		spriteData
 			.img
-			.pipe(imagemin({
+			.pipe(minifyImg({
 				optimizationLevel: 3,
 				progressive: true,
 				interlaced: true
@@ -220,21 +205,21 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 gulp.task('default', ['clean', 'copy', 'sprite',  'r'], function(){
 	
 	//监听不合并图片
-	gulp.watch(path.dev+'img/default/**', ['copy:images']);
+	gulp.watch(path.dev+'img/default/*/*.*', ['copy:images']);
 	
 	//监听sprite png
-	gulp.watch(path.dev+'img/sprite/**.png', ['sprite:png']);
+	gulp.watch(path.dev+'img/sprite/*.png', ['sprite:png']);
 	
 	//监听sprite jpg
-	gulp.watch(path.dev+'img/sprite/**.jpg', ['sprite:jpg']);
+	gulp.watch(path.dev+'img/sprite/*.jpg', ['sprite:jpg']);
 	
 	//监听tpl
-	gulp.watch(path.dev+'tpl/**', ['tmod']);
+	gulp.watch(path.dev+'tpl/*/*.*', ['tmod']);
 		
 	//监听js
-    gulp.watch(path.dev+'js/**', ['r']);
+    gulp.watch(path.dev+'js/*/*.*', ['r']);
 	
     //监听less
-    gulp.watch(path.dev+'less/**', ['less']);
+    gulp.watch(path.dev+'less/*/*.*', ['less']);
 	
 });

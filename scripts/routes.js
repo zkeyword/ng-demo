@@ -79,9 +79,7 @@ define(function(require) {
 					params: {
 						id: '1',
 					},
-					controller: function($scope) {
-						console.log(11111111111111111111111111111111111111)
-					}
+					controller: 'formViewController'
 				});
 			
 			$urlRouterProvider.otherwise('/');

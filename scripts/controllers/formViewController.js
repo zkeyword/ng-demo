@@ -15,6 +15,8 @@ define(function(require){
 			template,
 			dateService
 		){
+			
+			$scope.formData = {textarea:'xxx'};
 
 			$scope.save = function(){
 				var url         = 'data/data.php',
