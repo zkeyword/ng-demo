@@ -1,8 +1,6 @@
 var gulp        = require('gulp'),
 	less        = require('gulp-less'),
 	rjs         = require('gulp-requirejs'),
-	jshint      = require('gulp-jshint'),
-	//maps        = require('gulp-sourcemaps'),
 	minifyJs    = require('gulp-uglify'),
 	minifyCss   = require('gulp-minify-css'),
 	minifyHTML  = require('gulp-htmlmin'),
@@ -10,82 +8,67 @@ var gulp        = require('gulp'),
 	sprite      = require('gulp.spritesmith'),
 	clean       = require('gulp-clean'),
 	plumber     = require('gulp-plumber'),
-	concat      = require('gulp-concat'),
-	tmodjs      = require('gulp-tmod'),
 	cache       = require('gulp-cache'),
 	path       	= {
-					dev: 'app/scripts2/',
-					dest: 'app/scripts2-dest/'
+					dev: 'dev/',
+					dest: 'dest/'
 				};
 
 
 //less
 gulp.task('less', function () {
     gulp
-		.src(path.dev+'less/styles.less')
-        //.pipe(maps.init())
+		.src(path.dev+'styles/styles.less')
 		.pipe(plumber(function(error){
 			console.log(error);
 			console.log('--------------------------  less Syntax Error! --------------------------');
 		}))
 		.pipe(less())
 		.pipe(minifyCss({compatibility: 'ie7'}))
-		//.pipe(maps.write('./'))
-        .pipe(gulp.dest(path.dest+'css'));
+        .pipe(gulp.dest(path.dest+'styles'));
 });
-
-
-//jshint
-gulp.task('jshint', function() {
-	gulp
-		.src(path.dev+'js/core/drag.js')
-        .pipe(jshint('.jshintrc'))
-        .pipe(jshint.reporter('default'));	
-})
-
 
 //requirejs
 gulp.task('r', function() {
 
     rjs({
         name: '../main',
-        baseUrl: path.dev+'lib/',
+        baseUrl: path.dev+'/scripts',
 		paths: {
-			'angular' : 'angular.min',
-			'uiRouter' : 'angular-ui-router.min',
-			'angular-animate' : 'angular-animate.min',
-			'require' : 'require',
+			'angular' : '../lib/angular.min',
+			'uiRouter' : '../lib/angular-ui-router.min',
+			'angular-animate' : '../lib/angular-animate.min',
+			'require' : '../lib/require',
+			'template' : '../lib/template'
+		},
+		shim: {
+			'angular': {
+				exports: 'angular'
+			},
+			'angular-animate': {
+				deps: ['angular']
+			},
+			'uiRouter': {
+				deps: ['angular']
+			}
 		},
 		mainConfigFile:path.dev+'/main.js',
         out: 'main.js',
 		optimize:false
     })
 	//.pipe(minifyJs())
-	.pipe(maps.write('./'))
     .pipe(gulp.dest(path.dest));
 
 });
 
-
-//tmod.js
-gulp.task('tmod', function() {
-	gulp.src(path.dev + '/tpl/**/*.html')
-		.pipe(tmodjs({
-			base:  path.dev + 'tpl',
-			combo: true,
-			output: path.dev + 'js/app/'
-		}));
-});
-
-//
+//html
 gulp.task('html', function() {
-	gulp.src( paths.htmlFiles , { base : REQUIREJS } )
-        //.pipe( changed( DIST ) )
-        .pipe( minifyHTML( {
+	gulp.src(path.dev+'views/**.html')
+        .pipe(minifyHTML({
             removeComments : true ,
             collapseWhitespace : true
-        } ) )
-        .pipe( gulp.dest( DIST ) );
+        }))
+        .pipe(gulp.dest(path.dest+'views'));
 });
 
 //清理图片
@@ -94,7 +77,7 @@ gulp.task('clean', [/*'clean:css', 'clean:js', */'clean:imagesDefault', 'clean:i
 gulp.task('clean:css', function() {
 	gulp
 		.src([
-			path.dest+'css/**'
+			path.dest+'styles/**'
 		], {read: false})
 		.pipe(clean({force: true}));
 });
@@ -102,7 +85,7 @@ gulp.task('clean:css', function() {
 gulp.task('clean:js', function() {
 	gulp
 		.src([
-			path.dest+'js/**/*'
+			path.dest+'scripts/**'
 		], {read: false})
 		.pipe(clean({force: true}));
 });
@@ -110,7 +93,7 @@ gulp.task('clean:js', function() {
 gulp.task('clean:imagesDefault', function() {
 	gulp
 		.src([
-			path.dest+'img/default/*.{png,jpg,jpeg,gif}'
+			path.dest+'images/default/*.{png,jpg,jpeg,gif}'
 		], {read: false})
 		.pipe(clean({force: true}));
 });
@@ -118,7 +101,7 @@ gulp.task('clean:imagesDefault', function() {
 gulp.task('clean:imagesSprite', function() {
 	gulp
 		.src([
-			path.dest+'img/sprite/*.{png,jpg}'
+			path.dest+'images/sprite/*.{png,jpg}'
 		], {read: false})
 		.pipe(clean({force: true}));
 });
@@ -134,19 +117,19 @@ gulp.task('copy:plugs', function(){
 
 gulp.task('copy:js', function(){
 	gulp
-		.src(path.dev+'js/lib/*')
-		.pipe(gulp.dest(path.dest+'js/lib/'));
+		.src(path.dev+'lib/*')
+		.pipe(gulp.dest(path.dest+'lib/'));
 });
 
 gulp.task('copy:images', function(){
 	gulp
-		.src(path.dev+'img/default/**/*.{png,jpg,jpeg,gif}')
+		.src(path.dev+'images/default/**/*.{png,jpg,jpeg,gif}')
 		.pipe(cache(minifyImg({
 			optimizationLevel: 3,
 			progressive: true,
 			interlaced: true
 		})))
-		.pipe(gulp.dest(path.dest+'img/'));
+		.pipe(gulp.dest(path.dest+'images/'));
 });
 
 
@@ -156,12 +139,12 @@ gulp.task('sprite', ['sprite:png', 'sprite:jpg']);
 //合并png
 gulp.task('sprite:png', ['clean:imagesSprite'], function () {	
 	var spriteData = gulp
-						.src(path.dev+'img/sprite/**.png')
+						.src(path.dev+'images/sprite/**.png')
 						.pipe(sprite({
 							imgName: 'sprite.png',
 							cssName: 'sprite-png.css',
 							cssTemplate: path.dev+'less/core/handlebarsStr.css.handlebars',
-							imgPath: '../img/sprite.png'
+							imgPath: '../images/sprite.png'
 						}));
 		spriteData
 			.img
@@ -170,7 +153,7 @@ gulp.task('sprite:png', ['clean:imagesSprite'], function () {
 				progressive: true,
 				interlaced: true
 			}))
-			.pipe(gulp.dest(path.dest+'img/'));
+			.pipe(gulp.dest(path.dest+'images/'));
 		
 		spriteData
 			.css
@@ -185,7 +168,7 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 							imgName: 'sprite.jpg',
 							cssName: 'sprite-jpg.css',
 							cssTemplate: path.dev+'less/core/handlebarsStr.css.handlebars',
-							imgPath: '../img/sprite.jpg'
+							imgPath: '../images/sprite.jpg'
 						}));
 		spriteData
 			.img
@@ -194,7 +177,7 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 				progressive: true,
 				interlaced: true
 			}))
-			.pipe(gulp.dest(path.dest+'img/'));
+			.pipe(gulp.dest(path.dest+'images/'));
 		
 		spriteData
 			.css
@@ -205,21 +188,18 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 gulp.task('default', ['clean', 'copy', 'sprite',  'r'], function(){
 	
 	//监听不合并图片
-	gulp.watch(path.dev+'img/default/*/*.*', ['copy:images']);
+	gulp.watch(path.dev+'images/default/**', ['copy:images']);
 	
 	//监听sprite png
-	gulp.watch(path.dev+'img/sprite/*.png', ['sprite:png']);
+	gulp.watch(path.dev+'images/sprite/*.png', ['sprite:png']);
 	
 	//监听sprite jpg
-	gulp.watch(path.dev+'img/sprite/*.jpg', ['sprite:jpg']);
+	gulp.watch(path.dev+'images/sprite/*.jpg', ['sprite:jpg']);
 	
-	//监听tpl
-	gulp.watch(path.dev+'tpl/*/*.*', ['tmod']);
-		
 	//监听js
-    gulp.watch(path.dev+'js/*/*.*', ['r']);
+    gulp.watch(path.dev+'scripts/**', ['r']);
 	
     //监听less
-    gulp.watch(path.dev+'less/*/*.*', ['less']);
+    gulp.watch(path.dev+'styles/**', ['less']);
 	
 });
