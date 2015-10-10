@@ -1,13 +1,14 @@
 define(function(require){
-	require('app').controller('HomeViewController', [
+	require('app').controller('homeViewController', [
+	    '$rootScope',
         '$scope',
 		'dateService',
 		
         function(
+        	$rootScope,
 			$scope,
 			dateService
 		){
-			
 			$scope.hello = '<span>Hello World from first-controller</span><script type="text/javascript">alert("xxx")</script>';
 			if(!dateService.getNow()) {
 				dateService.setNow();

@@ -18,5 +18,6 @@ require.config({
 			deps: ['angular']
 		}
 	},
-	deps: ['bootstrap']
+	deps: ['bootstrap'],
+	urlArgs: "bust=" + (new Date()).getTime()
 });

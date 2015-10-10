@@ -393,6 +393,32 @@ define('directives/start-directive',['require','app'],function(require){
 	});
 	
 });
+define('directives/title',['require','app'],function(require){
+	
+	
+	
+    require('app').directive('title', ['$rootScope', '$timeout',
+		function($rootScope, $timeout) {
+			return {
+				link: function() {
+
+					var listener = function(event, toState) {
+
+						$timeout(function() {
+							console.log(toState)
+							$rootScope.title = (toState.data && toState.data.pageTitle) 
+							? toState.data.pageTitle 
+							: 'Default title';
+						});
+					};
+
+					$rootScope.$on('$stateChangeSuccess', listener);
+				}
+			};
+		}
+	]);
+	
+});
 define('services/date',['require','app'],function(require) {
 	
 	
@@ -608,16 +634,49 @@ define('services/template',['require','template','app'],function (require) {
 	]);
 
 });
-define('controllers/HomeViewController',['require','app'],function(require){
-	require('app').controller('HomeViewController', [
+define('services/page',['require','app'],function (require) {
+
+	
+
+	require('app').factory('page', [
+			"$document", 
+			"$compile", 
+			"$rootScope", 
+			"$controller", 
+			"$timeout",
+			
+			function (
+				$document, 
+				$compile, 
+				$rootScope, 
+				$controller, 
+				$timeout
+			) {
+				var defaults = {
+					id : null,
+					template : null
+				};
+				
+				var body = $document.find('body');
+
+				return function Page(templateUrl, options, passedInLocals) {
+					console.log(body)
+				};
+			}
+		]);
+
+});
+define('controllers/homeViewController',['require','app'],function(require){
+	require('app').controller('homeViewController', [
+	    '$rootScope',
         '$scope',
 		'dateService',
 		
         function(
+        	$rootScope,
 			$scope,
 			dateService
 		){
-			
 			$scope.hello = '<span>Hello World from first-controller</span><script type="text/javascript">alert("xxx")</script>';
 			if(!dateService.getNow()) {
 				dateService.setNow();
@@ -632,44 +691,52 @@ define('controllers/HomeViewController',['require','app'],function(require){
         }
     ]);
 });
-define('controllers/ContactViewController',['require','app'],function(require){
+define('controllers/userViewController',['require','app'],function(require){
 	
-	require('app').controller('ContactViewController', [
+	require('app').controller('userViewController', [
+	    '$rootScope',
         '$scope',
 		'$http',
+		'$stateParams',
 		'dateService',
+		'template',
+		'createDialog',
+		'page',
 		
         function(
+        	$rootScope,
 			$scope,
 			$http,
-			dateService
+			$stateParams,
+			dateService,
+			template,
+			createDialog,
+			page
 		){
-			console.log('IN: second-controller');
-			$scope.hello = 'Hello World from second-controller';
-			if(!dateService.getNow()) {
-				dateService.setNow();
-			}
-			$scope.myDate = dateService.getNow();
-			$scope.myOtherDate = dateService.getTimeFromNow(
-				dateService.minutes(5)
-			);
 			
-			var url  = "data/data.json",
-				url2 = "data/data2.json"
+			$scope.id = $stateParams.id;
 			
-			$scope.isShow = true;
-			
-			$http.get(url).success( function(response) {
-				$scope.students = response;
+			var url = "data/data.json"
+						
+			$http.get(url).success(function(response) {
+				$scope.list = response;
 			});
 			
-			$scope.getStudents = function(){
-				$http.get(url2).success( function(response) {
-					$scope.students = response;
+			$scope.del = function(id, item){
+				createDialog({
+					id: 'simpleDialog',
+					template: template('popHtml', item),
+					title: '系统提示',
+					backdrop: true,
+					success: {label: '确定', fn: function() {
+						console.log(item)
+					}}
 				});
-			}
-
-			$scope.pageClass = 'page-about';
+			};
+			
+			page();
+			
+			$scope.pageClass = 'page-user';
         }
     ]);
 });
@@ -690,8 +757,6 @@ define('controllers/formViewController',['require','app'],function(require){
 			template,
 			dateService
 		){
-			
-			$scope.formData = {textarea:'xxx'};
 
 			$scope.save = function(){
 				var url         = 'data/data.php',
@@ -728,18 +793,19 @@ define('controllers/formViewController',['require','app'],function(require){
     ]);
 	
 });
-define('routes',['require','directives/start-directive','services/date','services/dialog','services/template','controllers/HomeViewController','controllers/ContactViewController','controllers/formViewController','app'],function(require) {
+define('routes',['require','directives/start-directive','directives/title','services/date','services/dialog','services/template','services/page','controllers/homeViewController','controllers/userViewController','controllers/formViewController','app'],function(require) {
 	
 	
 	
 	require('directives/start-directive');
+	require('directives/title');
 	require('services/date');
 	require('services/dialog');
 	require('services/template');
+	require('services/page');
 	
-	
-	require('controllers/HomeViewController');
-	require('controllers/ContactViewController');
+	require('controllers/homeViewController');
+	require('controllers/userViewController');
 	require('controllers/formViewController');
 
 	return require('app').config([
@@ -755,64 +821,60 @@ define('routes',['require','directives/start-directive','services/date','service
 					url: '/',
 					views: {
 						'': {
-							templateUrl: './dest/views/home.html',
-							controller: 'HomeViewController'
+							templateUrl: './dest/views/layout.html',
+							controller: 'homeViewController'
+						},
+						'header@home': {
+							templateUrl: './dest/views/common/header.html'
+						},
+						'footer@home': {
+							templateUrl: './dest/views/common/footer.html'
 						},
 						'left@home': {
-							template: '这里是第一列的内容'
+							templateUrl: './dest/views/common/menu.html'
 						},
 						'right@home': {
-							template: '这里是第一列的内容'
+							templateUrl: './dest/views/index.html'
 						}
+					},
+					data:{
+						pageTitle: 'home'
 					}
 				})
-				.state('home.form', {
-					url: 'form/',
+				.state('home.user', {
+					url: 'user',
 					views: {
 						'right@home': {
-							templateUrl: './dest/views/form.html',
-							controller: 'formViewController'
+							templateUrl: './dest/views/user/index.html',
+							controller: 'userViewController'
+						}
+					},
+					data:{
+						pageTitle: 'user'
+					}
+				})
+				.state('home.user.add', {
+					url: '/add',
+					views: {
+						'right@home': {
+							templateUrl: './dest/views/user/add.html',
+							controller: 'userViewController'
 						}
 					}
 				})
-				.state('contact', {
-					url: "/contact",
-					templateUrl: './dest/views/contact.html',
-					controller: function($scope) {
-						console.log(2222222222)
-					}
-				})
-				.state('contact.detail', {
-					url: "/detail/:id",
-					templateUrl: './dest/views/contact.detail.html',
+				.state('home.user.detail', {
+					url: '/detail/:id',
 					params: {
 						id: '1',
 					},
-					controller: function ($scope, $stateParams) {
-						$scope.stateParams = $stateParams;
-						console.log( $stateParams )
+					views: {
+						'right@home': {
+							templateUrl: './dest/views/user/detail.html',
+							controller: 'userViewController'
+						}
 					}
-				})
-				.state('contact.edit', {
-					url: '/edit/:id',
-					templateUrl: './dest/views/contact.edit.html',
-					params: {
-						id: '1',
-					},
-					controller: function($scope) {
-						console.log(11111111111111111111111111111111111111)
-					}
-				})
-				.state('form', {
-					url: '/form',
-					templateUrl: './dest/views/form.html',
-					params: {
-						id: '1',
-					},
-					controller: 'formViewController'
 				});
-			
-			
+				
 			
 			$urlRouterProvider.otherwise('/');
 		}
@@ -848,7 +910,8 @@ require.config({
 			deps: ['angular']
 		}
 	},
-	deps: ['bootstrap']
+	deps: ['bootstrap'],
+	urlArgs: "bust=" + (new Date()).getTime()
 });
 
 define("../main", function(){});

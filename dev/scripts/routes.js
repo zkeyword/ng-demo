@@ -3,13 +3,14 @@ define(function(require) {
 	'use strict';
 	
 	require('directives/start-directive');
+	require('directives/title');
 	require('services/date');
 	require('services/dialog');
 	require('services/template');
+	require('services/page');
 	
-	
-	require('controllers/HomeViewController');
-	require('controllers/ContactViewController');
+	require('controllers/homeViewController');
+	require('controllers/userViewController');
 	require('controllers/formViewController');
 
 	return require('app').config([
@@ -25,64 +26,60 @@ define(function(require) {
 					url: '/',
 					views: {
 						'': {
-							templateUrl: './dest/views/home.html',
-							controller: 'HomeViewController'
+							templateUrl: './dest/views/layout.html',
+							controller: 'homeViewController'
+						},
+						'header@home': {
+							templateUrl: './dest/views/common/header.html'
+						},
+						'footer@home': {
+							templateUrl: './dest/views/common/footer.html'
 						},
 						'left@home': {
-							template: '这里是第一列的内容'
+							templateUrl: './dest/views/common/menu.html'
 						},
 						'right@home': {
-							template: '这里是第一列的内容'
+							templateUrl: './dest/views/index.html'
 						}
+					},
+					data:{
+						pageTitle: 'home'
 					}
 				})
-				.state('home.form', {
-					url: 'form/',
+				.state('home.user', {
+					url: 'user',
 					views: {
 						'right@home': {
-							templateUrl: './dest/views/form.html',
-							controller: 'formViewController'
+							templateUrl: './dest/views/user/index.html',
+							controller: 'userViewController'
+						}
+					},
+					data:{
+						pageTitle: 'user'
+					}
+				})
+				.state('home.user.add', {
+					url: '/add',
+					views: {
+						'right@home': {
+							templateUrl: './dest/views/user/add.html',
+							controller: 'userViewController'
 						}
 					}
 				})
-				.state('contact', {
-					url: "/contact",
-					templateUrl: './dest/views/contact.html',
-					controller: function($scope) {
-						console.log(2222222222)
-					}
-				})
-				.state('contact.detail', {
-					url: "/detail/:id",
-					templateUrl: './dest/views/contact.detail.html',
+				.state('home.user.detail', {
+					url: '/detail/:id',
 					params: {
 						id: '1',
 					},
-					controller: function ($scope, $stateParams) {
-						$scope.stateParams = $stateParams;
-						console.log( $stateParams )
+					views: {
+						'right@home': {
+							templateUrl: './dest/views/user/detail.html',
+							controller: 'userViewController'
+						}
 					}
-				})
-				.state('contact.edit', {
-					url: '/edit/:id',
-					templateUrl: './dest/views/contact.edit.html',
-					params: {
-						id: '1',
-					},
-					controller: function($scope) {
-						console.log(11111111111111111111111111111111111111)
-					}
-				})
-				.state('form', {
-					url: '/form',
-					templateUrl: './dest/views/form.html',
-					params: {
-						id: '1',
-					},
-					controller: 'formViewController'
 				});
-			
-			
+				
 			
 			$urlRouterProvider.otherwise('/');
 		}

@@ -1,0 +1,1 @@
+<div class="mod-filter"><a ui-sref="home.user.add" class="ui-btn">新增用户</a></div><div id="l-grid"><table><tr><th>名称</th><th>操作</th></tr><tr ng-repeat="item in list.rows"><td><a ui-sref="home.user.detail({id:item.id})">{{item.name}}</a></td><td><a ng-click="del(item.id, item)">删除</a></td></tr></table></div><script type="text/html" id="popHtml">确认删除{{name}}？</script>

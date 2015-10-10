@@ -63,7 +63,7 @@ gulp.task('r', function() {
 
 //html
 gulp.task('html', function() {
-	gulp.src(path.dev+'views/**.html')
+	gulp.src(path.dev+'views/**/**.html')
         .pipe(minifyHTML({
             removeComments : true ,
             collapseWhitespace : true
@@ -86,6 +86,14 @@ gulp.task('clean:js', function() {
 	gulp
 		.src([
 			path.dest+'scripts/**'
+		], {read: false})
+		.pipe(clean({force: true}));
+});
+
+gulp.task('clean:html', function() {
+	gulp
+		.src([
+			path.dest+'views/**'
 		], {read: false})
 		.pipe(clean({force: true}));
 });
@@ -185,7 +193,7 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 });
 
 //默认任务
-gulp.task('default', ['clean', 'copy', 'sprite',  'r'], function(){
+gulp.task('default', ['clean', 'copy', 'html', 'sprite',  'r'], function(){
 	
 	//监听不合并图片
 	gulp.watch(path.dev+'images/default/**', ['copy:images']);
@@ -201,5 +209,8 @@ gulp.task('default', ['clean', 'copy', 'sprite',  'r'], function(){
 	
     //监听less
     gulp.watch(path.dev+'styles/**', ['less']);
+	
+	//监听html
+    gulp.watch(path.dev+'views/**', ['html']);
 	
 });
