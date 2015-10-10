@@ -405,7 +405,6 @@ define('directives/title',['require','app'],function(require){
 					var listener = function(event, toState) {
 
 						$timeout(function() {
-							console.log(toState)
 							$rootScope.title = (toState.data && toState.data.pageTitle) 
 							? toState.data.pageTitle 
 							: 'Default title';
