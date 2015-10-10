@@ -184,7 +184,7 @@ gulp.task('sprite:jpg', ['clean:imagesSprite'], function () {
 			.pipe(gulp.dest(path.dev+'less/core/'));
 });
 
-
+//默认任务
 gulp.task('default', ['clean', 'copy', 'sprite',  'r'], function(){
 	
 	//监听不合并图片
